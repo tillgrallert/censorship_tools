@@ -75,7 +75,9 @@ plotCensorshipBarAggr <- ggplot(data = vCensorship, aes(x = year, # selects the 
   stat_summary(fun.y = sum, # adds up all observations for the period
                geom = "bar", # or "line"
                na.rm=TRUE) + # remove all empty/invalid levels
-  scale_x_date(breaks=date_breaks("2 years"), labels=date_format("%Y")) +
+  scale_x_date(breaks=date_breaks("2 years"), 
+               labels=date_format("%Y"),
+               limits=as.Date(c(vDateStart, vDateStop))) + # if plotting more than one graph, it is helpful to provide the same limits for each
   theme_bw() # make the themeblack-and-white rather than grey
 plotCensorshipBarAggr
 
