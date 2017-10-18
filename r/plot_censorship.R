@@ -51,8 +51,10 @@ vCensorshipPermits <- subset(vCensorshipPeriod,action=="P")
 # plot
 ## plot a time series
 plotCensorshipTime <- ggplot(vCensorshipPeriod, aes(x = quarter, y = action)) +
-  ggtitle("Censorship in Bilad al-Sham") + # plot label
-  xlab("Date") + ylab("Action") + # axis labels
+  labs(title="Censorship in Bilad al-Sham", 
+       # subtitle="based on announcements in newspapers", 
+       x="Date", 
+       y="Action")+ # provides title, subtitle, x, y, caption
   geom_point(aes(col=action), # color, size, shape, stroke can be made dependent on columns
              na.rm=TRUE,
              size=3, 
