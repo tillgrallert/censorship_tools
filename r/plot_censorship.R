@@ -64,6 +64,18 @@ plotCensorshipBar <- ggplot(vCensorshipPeriod, aes(x = action, fill = action)) +
   geom_bar() +
   theme_bw() # make the themeblack-and-white rather than grey (do this before font changes, or it overridesthem)
   
+## bar plot for aggregated periods using `stat_sum`
+plotCensorshipBarAggr <- ggplot(data = vCensorship, aes(x = year, # selects the period
+                                       y=action, fill=action)) +
+  ggtitle("Censorship in Bilad al-Sham") + # plot label
+  xlab("Date") + ylab("Action") + # axis labels
+  stat_summary(fun.y = sum, # adds up all observations for the period
+               geom = "bar", # or "line"
+               na.rm=TRUE) + # remove all empty/invalid levels
+  scale_x_date(breaks=date_breaks("2 years"), labels=date_format("%Y")) +
+  theme_bw() # make the themeblack-and-white rather than grey
+plotCensorshipBarAggr
+
 ## trials
 plotCensorshipTime1 <- ggplot(subset(vCensorshipPeriod,action=="P"), aes(x = date, y = action)) +
   ggtitle("Censorship in Bilad al-Sham") +
