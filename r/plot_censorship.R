@@ -53,7 +53,10 @@ vCensorshipPermits <- subset(vCensorshipPeriod,action=="P")
 plotCensorshipTime <- ggplot(vCensorshipPeriod, aes(x = quarter, y = action)) +
   ggtitle("Censorship in Bilad al-Sham") + # plot label
   xlab("Date") + ylab("Action") + # axis labels
-  geom_point(na.rm=TRUE,color= "red",  size=3, pch=1) +
+  geom_point(aes(col=action), # color, size, shape, stroke can be made dependent on columns
+             na.rm=TRUE,
+             size=3, 
+             pch=1) + # shape
   scale_x_date(breaks=date_breaks("2 years"), labels=date_format("%Y")) +
   theme_bw() # make the themeblack-and-white rather than grey (do this before font changes, or it overridesthem)
 plotCensorshipTime
