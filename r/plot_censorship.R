@@ -18,6 +18,22 @@ vCensorship <- read.csv("csv/censorship-levant.csv", header=TRUE, sep = ",", quo
 # convert date to Date class
 vCensorship$date <- as.Date(vCensorship$date)
 
+# aggregate periods
+## there is an option to add a column that contains the year as string, but this is not particularly helpful
+vCensorship$year <-format(vCensorship$date,format="%Y")
+
+## use cut() to generate summary stats for time periods
+## create variables of the year, quarter week and month of each observation:
+vCensorship$year <- as.Date(cut(vCensorship$date,
+                                breaks = "year"))
+vCensorship$quarter <- as.Date(cut(vCensorship$date,
+                                   breaks = "quarter"))
+vCensorship$month <- as.Date(cut(vCensorship$date,
+                                 breaks = "month"))
+vCensorship$week <- as.Date(cut(vCensorship$date,
+                                breaks = "week",
+                                start.on.monday = TRUE)) # allows to change weekly break point to Sunday
+
 # select rows
 ## select the first row (containing dates), and the rows containing prices in ops
 # v_wheatKileSimple <- v_wheatKile[,c("date","quantity.2","quantity.3")]
@@ -28,13 +44,15 @@ vDateStop <- as.Date("1914-12-31")
 vCensorshipPeriod <- funcPeriod(vCensorship,vDateStart,vDateStop)
 
 ## create a subset of rows based on conditions
-vCensorshipWarnings <- subset(vCensorshipPeriod,Action=="W")
+vCensorshipWarnings <- subset(vCensorshipPeriod,action=="W")
+vCensorshipSuspensions <- subset(vCensorshipPeriod,action=="S")
+vCensorshipPermits <- subset(vCensorshipPeriod,action=="P")
 
 # plot
 ## plot a time series
-plotCensorshipTime <- ggplot(vCensorshipPeriod, aes(x = date, y = action)) +
-  ggtitle("Censorship in Bilad al-Sham") +
-  xlab("Date") + ylab("Action") +
+plotCensorshipTime <- ggplot(vCensorshipPeriod, aes(x = quarter, y = action)) +
+  ggtitle("Censorship in Bilad al-Sham") + # plot label
+  xlab("Date") + ylab("Action") + # axis labels
   geom_point(na.rm=TRUE,color= "red",  size=3, pch=1) +
   scale_x_date(breaks=date_breaks("2 years"), labels=date_format("%Y")) +
   theme_bw() # make the themeblack-and-white rather than grey (do this before font changes, or it overridesthem)
@@ -47,7 +65,7 @@ plotCensorshipBar <- ggplot(vCensorshipPeriod, aes(x = action, fill = action)) +
   theme_bw() # make the themeblack-and-white rather than grey (do this before font changes, or it overridesthem)
   
 ## trials
-plotCensorshipTime1 <- ggplot(subset(vCensorshipPeriod,action=="S"), aes(x = date, y = action)) +
+plotCensorshipTime1 <- ggplot(subset(vCensorshipPeriod,action=="P"), aes(x = date, y = action)) +
   ggtitle("Censorship in Bilad al-Sham") +
   xlab("Date") + ylab("Action") +
   geom_point(na.rm=TRUE,color= "red",  size=5, pch=1) +
@@ -55,19 +73,5 @@ plotCensorshipTime1 <- ggplot(subset(vCensorshipPeriod,action=="S"), aes(x = dat
   theme_bw() # make the themeblack-and-white rather than grey (do this before font changes, or it overridesthem)
 plotCensorshipTime1
 
-# probe the data source
-str(vCensorshipPeriod)
-tableActionByNewspaper <- with(vCensorshipPeriod, table(newspaper,action))
-
-# try to aggregate by year
-actionAvgAnnual <- aggregate(vCensorshipPeriod$action, list(date=format(date, "%Y")),mean)
-
-# compute monthly averages
-##  Get months
-vCensorshipPeriod$Month <- months(vCensorshipPeriod$date)
-
-##  Get years
-vCensorshipPeriod$Year <- format(vCensorshipPeriod$date,format="%Y")
-
-##  Aggregate 'X2' on months and year and get mean
-aggregate(action ~ Month + Year , vCensorshipPeriod , mean )
+# output
+plotCensorshipBar
