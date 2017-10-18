@@ -58,7 +58,8 @@ plotCensorshipTime <- ggplot(vCensorshipPeriod, aes(x = quarter, y = action)) +
              size=3, 
              pch=1) + # shape
   scale_x_date(breaks=date_breaks("2 years"), labels=date_format("%Y")) +
-  theme_bw() # make the themeblack-and-white rather than grey (do this before font changes, or it overridesthem)
+  theme_bw() + # make the themeblack-and-white rather than grey (do this before font changes, or it overridesthem)
+  theme(legend.position="None")  # remove legend
 plotCensorshipTime
 
 ## bar plot
