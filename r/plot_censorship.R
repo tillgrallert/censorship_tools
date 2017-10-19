@@ -65,10 +65,12 @@ plotCensorshipTime <- ggplot(vCensorshipPeriod, aes(x = quarter, y = action)) +
 plotCensorshipTime
 
 ## bar plot
-plotCensorshipBar <- ggplot(vCensorshipPeriod, aes(x = action, fill = action)) +
+plotCensorshipBar <- ggplot(vCensorshipPeriod, aes(x = action)) +
   ggtitle("Censorship in Bilad al-Sham") +
-  geom_bar() +
+  geom_bar(aes(fill=action)) +
+  # geom_density(aes(fill=action))+ # density makes no sense in this context
   theme_bw() # make the themeblack-and-white rather than grey (do this before font changes, or it overridesthem)
+plotCensorshipBar
   
 ## bar plot for aggregated periods using `stat_sum`
 plotCensorshipBarAggr <- ggplot(data = vCensorship, aes(x = year, # selects the period
