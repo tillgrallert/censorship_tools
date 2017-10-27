@@ -30,6 +30,10 @@
     <xsl:template match="tei:row" mode="m_tei-to-csv">
         <xsl:apply-templates mode="m_tei-to-csv"/><xsl:value-of select="$v_new-line"/>
     </xsl:template>
+    <!-- header row -->
+    <xsl:template match="tei:row[@role='label']/tei:cell" mode="m_tei-to-csv">
+        <xsl:value-of select="lower-case(.)"/><xsl:value-of select="$p_separator"/>
+    </xsl:template>
     <xsl:template match="tei:cell" mode="m_tei-to-csv">
         <xsl:apply-templates mode="m_tei-to-csv"/><xsl:value-of select="$p_separator"/>
     </xsl:template>
@@ -39,7 +43,17 @@
     </xsl:template>
     <xsl:template match="tei:date" mode="m_tei-to-csv">
         <!-- needs support for other attributes than @when -->
-        <xsl:value-of select="@when"/>
+        <xsl:choose>
+            <xsl:when test="@notBefore">
+                <xsl:value-of select="@notBefore"/>
+            </xsl:when>
+            <xsl:when test="@notAfter">
+                <xsl:value-of select="@notAfter"/>
+            </xsl:when>
+            <xsl:when test="@when">
+                <xsl:value-of select="@when"/>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
     <xsl:template match="tei:ref[@type='SenteCitationID']" mode="m_tei-to-csv">
         <xsl:value-of select="@target"/>
