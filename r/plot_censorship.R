@@ -54,36 +54,69 @@ vCensorshipPermitsAnnual <- count(vCensorshipPermits,'year')
 vCensorshipSuspensionsAnnual <- count(vCensorshipSuspensions,'year')
 vCensorshipWarningsAnnual <- count(vCensorshipWarnings,'year')
 
+# limit to a specific location
+## Bil??d al-SH??m
+vCensorshipLocation <- subset(vCensorshipPeriod, location %in% c('Beirut','Damascus','Jaffa','Jerusalem'))
+
+# grouping types of action
+vCensorshipRestrictive <- subset(vCensorshipLocation, action %in% c('S','W','Trial','Raid','BI','CP'))
+vCensorshipPermissive <- subset(vCensorshipLocation, action %in% c('P','PI','PR','RP'))
+
 # plot
 ## plot frequencies of actions
-plotActionFrequency <- ggplot(vCensorshipPeriod)+
+### histogram
+plotRestrictive <- ggplot(vCensorshipRestrictive, aes(x=year))+
+  labs(title="Censorship in Bilad al-Sham", 
+       subtitle="Restrictions", 
+       x="Date", 
+       y="Frequency")+ # provides title, subtitle, x, y, caption
+  geom_bar(aes(fill=action),
+           position = "stack",
+           width = 100)+
+  scale_x_date(breaks=date_breaks("2 years"), 
+               labels=date_format("%Y"))+ #,
+  # limits=as.Date(c(vDateStart, vDateStop))) +
+  scale_y_continuous(breaks = waiver())+
+  theme_bw()
+plotRestrictive
+
+plotPermissive <- ggplot(vCensorshipPermissive, aes(x=year))+
+  labs(title="Censorship in Bilad al-Sham", 
+       subtitle="Permissions", 
+       x="Date", 
+       y="Frequency")+ # provides title, subtitle, x, y, caption
+  geom_bar(aes(fill=action),
+           position = "stack",
+           width = 100)+
+  scale_x_date(breaks=date_breaks("2 years"), 
+               labels=date_format("%Y"))+ #,
+  # limits=as.Date(c(vDateStart, vDateStop))) +
+  scale_y_continuous(breaks = waiver())+
+  theme_bw()
+plotPermissive
+
+### use individual layers
+plotActionFrequency <- ggplot()+
   labs(title="Censorship in Bilad al-Sham", 
        subtitle="based on announcements in newspapers", 
        x="Date", 
        y="Frequency")+ # provides title, subtitle, x, y, caption
   # layer: suspensions
-  geom_line(data=vCensorshipSuspensionsAnnual,
-            aes(x=year, y=freq), # color, size, shape, stroke can be made dependent on columns
-            na.rm=TRUE,
-            color="red",
-            size=1)+
+  geom_line(data=count(subset(vCensorshipLocation,action=="S"),'year'),aes(x=year, y=freq),na.rm=TRUE,color="#E32006",size=1)+
+  #geom_bar(data=count(subset(vCensorshipLocation,action=="S"),'year'), stat='identity', aes(x=year, y=freq), na.rm=TRUE, width = 5, color="#E32006", fill="#E32006")+
   # layer: warnings
-  geom_line(data=vCensorshipWarningsAnnual,
-            aes(x=year, y=freq), # color, size, shape, stroke can be made dependent on columns
-            na.rm=TRUE,
-            color="purple",
-            size=1)+
+  geom_line(data=count(subset(vCensorshipLocation,action=="W"),'year'),aes(x=year, y=freq),na.rm=TRUE,color="#871020",size=1)+
+  #geom_bar(data=count(subset(vCensorshipLocation,action=="W"),'year'), stat='identity', aes(x=year, y=freq), na.rm=TRUE, width = 5, color="#871020", fill="#871020")+
   # layer: permits
-  geom_line(data=vCensorshipPermitsAnnual,
-            aes(x=year, y=freq), # color, size, shape, stroke can be made dependent on columns
-            na.rm=TRUE,
-            color="green",
-            size=1)+
+  geom_line(data=count(subset(vCensorshipLocation,action=="P"),'year'),aes(x=year, y=freq),na.rm=TRUE,color="#209A00",size=1)+
+  #geom_bar(data=count(subset(vCensorshipLocation,action=="P"),'year'), stat='identity', aes(x=year, y=freq), na.rm=TRUE, width = 5, color="#209A00", fill="#209A00")+
   scale_x_date(breaks=date_breaks("2 years"), 
                labels=date_format("%Y"))+ #,
                # limits=as.Date(c(vDateStart, vDateStop))) +
+  scale_y_continuous(breaks = waiver())+
   theme_bw() # make the themeblack-and-white rather than grey (do this before font changes, or it overridesthem)
 plotActionFrequency
+
 ## plot a time series for all 
 plotCensorshipTime <- ggplot(vCensorshipPeriod, aes(x = quarter, y = action)) +
   labs(title="Censorship in Bilad al-Sham", 
