@@ -6,7 +6,7 @@ library(scales)   # to access breaks/formatting functions
 library(gridExtra) # for arranging plots
 library(plotly) # interactive plots based on ggplot
 library(dplyr) # for data cleaning
-library(plyr)
+#library(plyr)
 
 # function to create subsets for periods
 funcPeriod <- function(f,x,y){f[f$date >= x & f$date <= y,]}
@@ -56,23 +56,28 @@ vCensorshipWarningsAnnual <- count(vCensorshipWarnings,'year')
 
 # limit to a specific location
 ## Bil??d al-SH??m
-vCensorshipLocation <- subset(vCensorshipPeriod, location %in% c('Beirut','Damascus','Jaffa','Jerusalem'))
+vCensorshipLevant <- subset(vCensorshipPeriod, location %in% c('Aleppo','Beirut','Damascus','Haifa','Jaffa','Jerusalem'))
+## Egypt
+vCensorshipEgypt <- subset(vCensorshipPeriod, location %in% c('Alexandria', 'Cairo', 'Egypt'))
 
 # grouping types of action
-vCensorshipRestrictive <- subset(vCensorshipLocation, action %in% c('S','W','Trial','Raid','BI','CP'))
-vCensorshipPermissive <- subset(vCensorshipLocation, action %in% c('P','PI','PR','RP'))
+vCensorshipRestrictive <- subset(vCensorshipLevant, action %in% c('S','W','Trial','Raid','BI','CP'))
+vCensorshipPermissive <- subset(vCensorshipEgypt, action %in% c('P','PI','PR','RP'))
+vCensorshipPermits <- subset(vCensorshipLevant,action %in% c('P'))
+vCensorshipSuspensions <- subset(vCensorshipLevant,action %in% c('S'))
+vCensorshipWarnings <- subset(vCensorshipLevant,action %in% c('W'))
 
 # plot
 ## plot frequencies of actions
 ### histogram
-plotRestrictive <- ggplot(vCensorshipRestrictive, aes(x=year))+
+plotRestrictive <- ggplot()+
   labs(title="Censorship in Bilad al-Sham", 
        subtitle="Restrictions", 
        x="Date", 
        y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(aes(fill=action),
-           position = "stack",
-           width = 100)+
+  geom_bar(data=vCensorshipRestrictive, aes(x=year,fill=action),position = "stack",width = 200)+
+  #geom_bar(data=vCensorshipSuspensions, aes(x=year,fill=action),position = "stack",width = 200)+
+  #geom_bar(data=vCensorshipWarnings, aes(x=year,fill=action),position = "stack",width = 200)+
   scale_x_date(breaks=date_breaks("2 years"), 
                labels=date_format("%Y"))+ #,
   # limits=as.Date(c(vDateStart, vDateStop))) +
@@ -80,14 +85,14 @@ plotRestrictive <- ggplot(vCensorshipRestrictive, aes(x=year))+
   theme_bw()
 plotRestrictive
 
-plotPermissive <- ggplot(vCensorshipPermissive, aes(x=year))+
+plotPermissive <- ggplot(vCensorshipPermissive, aes(x=quarter))+
   labs(title="Censorship in Bilad al-Sham", 
        subtitle="Permissions", 
        x="Date", 
        y="Frequency")+ # provides title, subtitle, x, y, caption
   geom_bar(aes(fill=action),
            position = "stack",
-           width = 100)+
+           width = 50)+
   scale_x_date(breaks=date_breaks("2 years"), 
                labels=date_format("%Y"))+ #,
   # limits=as.Date(c(vDateStart, vDateStop))) +
@@ -102,14 +107,14 @@ plotActionFrequency <- ggplot()+
        x="Date", 
        y="Frequency")+ # provides title, subtitle, x, y, caption
   # layer: suspensions
-  geom_line(data=count(subset(vCensorshipLocation,action=="S"),'year'),aes(x=year, y=freq),na.rm=TRUE,color="#E32006",size=1)+
-  #geom_bar(data=count(subset(vCensorshipLocation,action=="S"),'year'), stat='identity', aes(x=year, y=freq), na.rm=TRUE, width = 5, color="#E32006", fill="#E32006")+
+  geom_line(data=count(subset(vCensorshipLevant,action=="S"),'year'),aes(x=year, y=freq),na.rm=TRUE,color="#E32006",size=1)+
+  #geom_bar(data=count(subset(vCensorshipLevant,action=="S"),'year'), stat='identity', aes(x=year, y=freq), na.rm=TRUE, width = 5, color="#E32006", fill="#E32006")+
   # layer: warnings
-  geom_line(data=count(subset(vCensorshipLocation,action=="W"),'year'),aes(x=year, y=freq),na.rm=TRUE,color="#871020",size=1)+
-  #geom_bar(data=count(subset(vCensorshipLocation,action=="W"),'year'), stat='identity', aes(x=year, y=freq), na.rm=TRUE, width = 5, color="#871020", fill="#871020")+
+  geom_line(data=count(subset(vCensorshipLevant,action=="W"),'year'),aes(x=year, y=freq),na.rm=TRUE,color="#871020",size=1)+
+  #geom_bar(data=count(subset(vCensorshipLevant,action=="W"),'year'), stat='identity', aes(x=year, y=freq), na.rm=TRUE, width = 5, color="#871020", fill="#871020")+
   # layer: permits
-  geom_line(data=count(subset(vCensorshipLocation,action=="P"),'year'),aes(x=year, y=freq),na.rm=TRUE,color="#209A00",size=1)+
-  #geom_bar(data=count(subset(vCensorshipLocation,action=="P"),'year'), stat='identity', aes(x=year, y=freq), na.rm=TRUE, width = 5, color="#209A00", fill="#209A00")+
+  geom_line(data=count(subset(vCensorshipLevant,action=="P"),'year'),aes(x=year, y=freq),na.rm=TRUE,color="#209A00",size=1)+
+  #geom_bar(data=count(subset(vCensorshipLevant,action=="P"),'year'), stat='identity', aes(x=year, y=freq), na.rm=TRUE, width = 5, color="#209A00", fill="#209A00")+
   scale_x_date(breaks=date_breaks("2 years"), 
                labels=date_format("%Y"))+ #,
                # limits=as.Date(c(vDateStart, vDateStop))) +
