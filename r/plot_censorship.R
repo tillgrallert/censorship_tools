@@ -55,14 +55,14 @@ vCensorshipSuspensionsAnnual <- count(vCensorshipSuspensions,'year')
 vCensorshipWarningsAnnual <- count(vCensorshipWarnings,'year')
 
 # limit to a specific location
-## Bil??d al-SH??m
-vCensorshipLevant <- subset(vCensorshipPeriod, location %in% c('Aleppo','Beirut','Damascus','Haifa','Jaffa','Jerusalem'))
+## Bilād al-Shām
+vCensorshipLevant <- subset(vCensorshipPeriod, location %in% c('Aleppo','Baʿbdā','Beirut','Damascus','Haifa','Jaffa','Jerusalem'))
 ## Egypt
 vCensorshipEgypt <- subset(vCensorshipPeriod, location %in% c('Alexandria', 'Cairo', 'Egypt'))
 
 # grouping types of action
 vCensorshipRestrictive <- subset(vCensorshipLevant, action %in% c('S','W','Trial','Raid','BI','CP'))
-vCensorshipPermissive <- subset(vCensorshipEgypt, action %in% c('P','PI','PR','RP'))
+vCensorshipPermissive <- subset(vCensorshipLevant, action %in% c('P','PI','PR','RP'))
 vCensorshipPermits <- subset(vCensorshipLevant,action %in% c('P'))
 vCensorshipSuspensions <- subset(vCensorshipLevant,action %in% c('S'))
 vCensorshipWarnings <- subset(vCensorshipLevant,action %in% c('W'))
@@ -85,14 +85,14 @@ plotRestrictive <- ggplot()+
   theme_bw()
 plotRestrictive
 
-plotPermissive <- ggplot(vCensorshipPermissive, aes(x=quarter))+
+plotPermissive <- ggplot(vCensorshipPermissive, aes(x=year))+
   labs(title="Censorship in Bilad al-Sham", 
        subtitle="Permissions", 
        x="Date", 
        y="Frequency")+ # provides title, subtitle, x, y, caption
   geom_bar(aes(fill=action),
            position = "stack",
-           width = 50)+
+           width = 200)+
   scale_x_date(breaks=date_breaks("2 years"), 
                labels=date_format("%Y"))+ #,
   # limits=as.Date(c(vDateStart, vDateStop))) +
