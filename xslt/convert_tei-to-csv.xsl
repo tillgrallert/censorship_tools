@@ -27,6 +27,7 @@
     </xsl:template>
     <!-- supress output for all elements not specifically dealt with -->
     <xsl:template match="node()" mode="m_tei-to-csv"/>
+    <!-- rows -->
     <xsl:template match="tei:row" mode="m_tei-to-csv">
         <xsl:apply-templates mode="m_tei-to-csv"/><xsl:value-of select="$v_new-line"/>
     </xsl:template>
@@ -34,10 +35,17 @@
     <xsl:template match="tei:row[@role='label']/tei:cell" mode="m_tei-to-csv">
         <xsl:value-of select="lower-case(.)"/><xsl:value-of select="$p_separator"/>
     </xsl:template>
+    <!-- cells -->
     <xsl:template match="tei:cell" mode="m_tei-to-csv">
         <xsl:apply-templates mode="m_tei-to-csv"/><xsl:value-of select="$p_separator"/>
     </xsl:template>
     
+    <!-- take care of mark-up in cells -->
+    <xsl:template match="tei:title | tei:placeName" mode="m_tei-to-csv">
+        <xsl:apply-templates mode="m_tei-to-csv"/>
+    </xsl:template>
+    
+    <!-- generic text template -->
     <xsl:template match="text()" mode="m_tei-to-csv">
         <xsl:value-of select="replace(normalize-space(.),$p_separator,$p_separator-escape)"/>
     </xsl:template>
