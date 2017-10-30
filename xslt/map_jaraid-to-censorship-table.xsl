@@ -17,7 +17,7 @@
         <tei:row role="data">
             <!-- date -->
             <tei:cell>
-                <xsl:copy-of select="tei:monogr/tei:imprint/tei:date[@type='start']"/>
+                <xsl:apply-templates select="tei:monogr/tei:imprint/tei:date[@type='start']"/>
             </tei:cell>
             <!-- action -->
             <tei:cell>P</tei:cell>
@@ -29,13 +29,29 @@
             <!-- location -->
             <tei:cell><xsl:copy-of select="tei:monogr/tei:imprint/tei:pubPlace[1]/tei:placeName"/></tei:cell>
             <!-- source -->
+            <tei:cell/>
             <tei:cell>
                 <xsl:text>Jaraid</xsl:text>
             </tei:cell>
             <tei:cell/>
             <tei:cell/>
-            <tei:cell/>
         </tei:row>
+    </xsl:template>
+    <xsl:template match="@*">
+        <xsl:copy/>
+    </xsl:template>
+    <xsl:template match="tei:date">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:choose>
+                <xsl:when test="@when">
+                    <xsl:value-of select="@when"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="."/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:copy>
     </xsl:template>
     
 </xsl:stylesheet>
