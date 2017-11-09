@@ -69,7 +69,7 @@ vCensorshipWarningsAnnual <- count(vCensorshipWarnings,'year')
 
 # limit to a specific location
 ## Bilād al-Shām
-vLevant <- subset(vCensorshipPeriod, location %in% c('Aleppo','Baʿbdā','Beirut','Damascus','Haifa','Jaffa','Jerusalem','Tripoli', 'Ottoman Empire'))
+vLevant <- subset(vCensorshipPeriod, location %in% c('Aleppo','Baʿbdā','Beirut','Damascus','Haifa','Hama','Hebron','Homs','Jaffa','Jerusalem','Nablus','Latakia','Tripoli', 'Ottoman Empire'))
 ## Egypt
 vEgypt <- subset(vCensorshipPeriod, location %in% c('Alexandria', 'Cairo', 'Egypt', 'Port Said'))
 vMaghrib <- subset(vCensorshipPeriod, location %in% c('ALgiers', 'Tunis'))
@@ -145,6 +145,23 @@ plotEgyptRestrictive <- ggplot()+
   scale_y_continuous(breaks = waiver())+
   theme_bw()
 plotEgyptRestrictive
+
+### histogramm: permissions in the Levant
+plotEgyptPermissive <- ggplot()+
+  labs(title="Censorship in Bilad al-Sham", 
+       subtitle="Permissions", 
+       x="Date", 
+       y="Frequency")+ # provides title, subtitle, x, y, caption
+  geom_bar(data=vEgyptPermissive, aes(x=year, fill=action),position = "stack", width = 200)+
+  #geom_bar(data=vCensorshipPermits, aes(x=year, fill=action),position = "stack", width = 200)+
+  # layer: legal framework
+  geom_jitter(data=vLawsPeriod,(aes(x=year,y=10)),size=3)+
+  scale_x_date(breaks=date_breaks("2 years"), 
+               labels=date_format("%Y"))+ #,
+  # limits=as.Date(c(vDateStart, vDateStop))) +
+  scale_y_continuous(breaks = waiver())+
+  theme_bw()
+plotEgyptPermissive
 
 ### use individual layers
 plotActionFrequency <- ggplot()+
