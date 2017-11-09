@@ -68,8 +68,8 @@ vCensorshipSuspensionsAnnual <- count(vCensorshipSuspensions,'year')
 vCensorshipWarningsAnnual <- count(vCensorshipWarnings,'year')
 
 # limit to a specific location
-## Bil??d al-Sh??m
-vLevant <- subset(vCensorshipPeriod, location %in% c('Aleppo','Ba??bd??','Beirut','Damascus','Haifa','Jaffa','Jerusalem','Tripoli', 'Ottoman Empire'))
+## Bilād al-Shām
+vLevant <- subset(vCensorshipPeriod, location %in% c('Aleppo','Baʿbdā','Beirut','Damascus','Haifa','Jaffa','Jerusalem','Tripoli', 'Ottoman Empire'))
 ## Egypt
 vEgypt <- subset(vCensorshipPeriod, location %in% c('Alexandria', 'Cairo', 'Egypt', 'Port Said'))
 vMaghrib <- subset(vCensorshipPeriod, location %in% c('ALgiers', 'Tunis'))
