@@ -6,7 +6,7 @@ library(scales)   # to access breaks/formatting functions
 library(gridExtra) # for arranging plots
 library(plotly) # interactive plots based on ggplot
 library(dplyr) # for data cleaning
-#library(plyr)
+library(plyr)
 
 # function to create subsets for periods
 funcPeriod <- function(f,x,y){f[f$date >= x & f$date <= y,]}
@@ -55,10 +55,10 @@ vLawsPeriod <- funcPeriod(vLaws,vDateStart,vDateStop)
 vCensorshipPermits <- subset(vCensorshipPeriod,action=="P")
 vCensorshipSuspensions <- subset(vCensorshipPeriod,action=="S")
 vCensorshipWarnings <- subset(vCensorshipPeriod,action=="W")
-
+vCensorshipEnd <- subset(vCensorshipPeriod,action=='CP')
 
 # calculate totals
-## annual total
+## annual totals, using the plyr package to get frequencies
 vCensorshipPermitsAnnual <- count(vCensorshipPermits,'year')
 vCensorshipSuspensionsAnnual <- count(vCensorshipSuspensions,'year')
 vCensorshipWarningsAnnual <- count(vCensorshipWarnings,'year')
@@ -70,6 +70,7 @@ vLevant <- subset(vCensorshipPeriod, location %in% c('Aleppo','Baʿbdā','Beirut
                                                      'Syria'))
 vBeirut <- subset(vCensorshipPeriod, location %in% c('Beirut'))
 vDamascus <- subset(vCensorshipPeriod, location %in% c('Damascus', 'Syria'))
+
 ## Egypt
 vEgypt <- subset(vCensorshipPeriod, location %in% c('Alexandria', 'Cairo', 'Egypt', 'Port Said'))
 vMaghrib <- subset(vCensorshipPeriod, location %in% c('ALgiers', 'Tunis'))
@@ -84,6 +85,12 @@ vLevantPermits <- subset(vLevant,action %in% c('P'))
 vLevantSuspensions <- subset(vLevant,action %in% c('S'))
 vLevantSuspensionsImplemented <- subset(vLevantSuspensions,implemented %in% c('yes'))
 vLevantWarnings <- subset(vLevant,action %in% c('W'))
+
+## descriptive stats
+### restrictions
+mean(count(vLevantSuspensions,'year')[,c('freq')])
+median(count(vLevantSuspensions,'year')[,c('freq')])
+sd(count(vLevantSuspensions,'year')[,c('freq')])
 
 # grouping types of action: Beirut
 vBeirutRestrictive <- subset(vBeirut, action %in% c('S','W','Trial','Raid','BI','CP'))
@@ -154,6 +161,8 @@ plotLevantSuspensions <- ggplot()+
   #geom_bar(data=vCensorshipWarnings, aes(x=year,fill=action),position = "stack",width = 200)+
   # layer: legal framework
   geom_jitter(data=vLawsPeriod,(aes(x=year,y=5)),size=3)+
+  # layer: line for mean; problem: this does not take into account years without suspensions
+  #geom_hline(yintercept = mean(count(vLevantSuspensions,'year')[,c('freq')]))+
   scale_x_date(breaks=date_breaks("2 years"), 
                labels=date_format("%Y"))+ #,
   # limits=as.Date(c(vDateStart, vDateStop))) +
