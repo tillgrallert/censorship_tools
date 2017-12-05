@@ -58,6 +58,9 @@
             <xsl:when test="@notAfter">
                 <xsl:value-of select="@notAfter"/>
             </xsl:when>
+            <xsl:when test="string-length(@when)=4">
+                <xsl:value-of select="concat(@when,'-01-01')"/>
+            </xsl:when>
             <xsl:when test="@when">
                 <xsl:value-of select="@when"/>
             </xsl:when>
