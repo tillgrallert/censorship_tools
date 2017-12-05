@@ -9,7 +9,10 @@
     
     <xsl:template match="/">
         <tei:table>
-        <xsl:apply-templates select="descendant::tei:table/tei:row/tei:cell/tei:biblStruct"/>
+            <!-- data on date of first publication and permits -->
+<!--        <xsl:apply-templates select="descendant::tei:table/tei:row/tei:cell/tei:biblStruct"/>-->
+            <!-- data on final publication dates -->
+            <xsl:apply-templates select="descendant::tei:table/tei:row/tei:cell[@n='3']/tei:date" mode="m_row"/>  
         </tei:table>
     </xsl:template>
     
@@ -37,6 +40,33 @@
             <tei:cell/>
         </tei:row>
     </xsl:template>
+    
+    <xsl:template match="tei:date" mode="m_row">
+        <xsl:variable name="v_biblstruct" select="ancestor::tei:row/tei:cell/tei:biblStruct"/>
+        <tei:row role="data">
+            <!-- date -->
+            <tei:cell>
+                <xsl:apply-templates select="."/>
+            </tei:cell>
+            <!-- action -->
+            <tei:cell>CP</tei:cell>
+            <tei:cell/>
+            <!-- title -->
+            <tei:cell>
+                <xsl:copy-of select="$v_biblstruct/tei:monogr/tei:title[@level='j']"/>
+            </tei:cell>
+            <!-- location -->
+            <tei:cell><xsl:copy-of select="$v_biblstruct/tei:monogr/tei:imprint/tei:pubPlace[1]/tei:placeName"/></tei:cell>
+            <!-- source -->
+            <tei:cell/>
+            <tei:cell>
+                <xsl:text>Jaraid</xsl:text>
+            </tei:cell>
+            <tei:cell/>
+            <tei:cell/>
+        </tei:row>
+    </xsl:template>
+    
     <xsl:template match="@*">
         <xsl:copy/>
     </xsl:template>
