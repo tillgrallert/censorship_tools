@@ -125,12 +125,18 @@ plotLevantRestrictive <- ggplot()+
   #geom_bar(data=vCensorshipSuspensions, aes(x=year,fill=action),position = "stack",width = 200)+
   #geom_bar(data=vCensorshipWarnings, aes(x=year,fill=action),position = "stack",width = 200)+
   # layer: legal framework
-  geom_jitter(data=vLawsPeriod,(aes(x=year,y=10)),size=3)+
+  #geom_jitter(data=vLawsPeriod,(aes(x=year,y=10)),size=3)+
+  geom_segment(data = vLawsPeriod, 
+               aes(x = date, y =5.5, 
+                   xend = date, yend = 8.5),
+               na.rm = T, linetype=4, # linetypes: 1=solid, 2=dashed, 
+               show.legend = NA, color = "black")+
   scale_x_date(breaks=date_breaks("2 years"), 
                labels=date_format("%Y"))+ #,
   # limits=as.Date(c(vDateStart, vDateStop))) +
   scale_y_continuous(breaks = waiver())+
-  theme_bw()
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust=0.5,hjust = 0.5, size = 8))  # rotate x axis text
 plotLevantRestrictive
 
 ### histogramm: permissions in the Levant
