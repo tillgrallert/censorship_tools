@@ -1,12 +1,11 @@
 # Remember it is good coding technique to add additional packages to the top of
 # your script 
 library(lubridate) # for working with dates
+library(tidyverse)
 library(ggplot2)  # for creating graphs
 library(scales)   # to access breaks/formatting functions
 library(gridExtra) # for arranging plots
 library(plotly) # interactive plots based on ggplot
-library(dplyr) # for data cleaning
-library(plyr)
 
 # function to create subsets for periods
 funcPeriod <- function(f,x,y){f[f$date >= x & f$date <= y,]}
