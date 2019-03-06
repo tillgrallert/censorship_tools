@@ -114,189 +114,58 @@ vEgyptWarnings <- subset(vEgypt,action %in% c('W'))
 
 # plot
 ## plot frequencies of actions
+f.plot <- function(data.events, label.location, label.subtitle) {
+  ggplot()+
+    labs(x = "Date", 
+         y = "Frequency",
+         title = paste("The press regime in ", label.location, sep = ""),
+         subtitle = label.subtitle,
+         caption = "Till Grallert, CC BY-SA 4.0")+ # provides title, subtitle, x, y, caption
+    geom_bar(data = data.events, 
+             aes(x = year,
+                 fill = action),
+             position = "stack",width = 200) +
+    # add a layer for laws
+    geom_segment(data = vLawsPeriod, 
+                 aes(x = date, y =5.5, 
+                     xend = date, yend = 8.5),
+                 na.rm = T, linetype=4, # linetypes: 1=solid, 2=dashed, 
+                 show.legend = NA, color = "black")+
+    scale_x_date(breaks=date_breaks("2 years"), labels=date_format("%Y")) +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust=0.5,hjust = 0.5, size = 8))  # rotate x axis text
+}
+## variables for saving plots
+width.Plot <- 400
+height.Plot <- width.Plot / 2
+dpi.Plot <- 300
+units.Plot <- "mm"
+setwd("/BachUni/research-projects/censorship/censorship_data/plots")
+
+
 ### histogram: restrictions in the Levant
-plotLevantRestrictive <- ggplot()+
-  labs(title="Censorship in Bilad al-Sham", 
-       subtitle="Restrictions", 
-       x="Date", 
-       y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(data=vLevantRestrictive, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipSuspensions, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipWarnings, aes(x=year,fill=action),position = "stack",width = 200)+
-  # layer: legal framework
-  #geom_jitter(data=vLawsPeriod,(aes(x=year,y=10)),size=3)+
-  geom_segment(data = vLawsPeriod, 
-               aes(x = date, y =5.5, 
-                   xend = date, yend = 8.5),
-               na.rm = T, linetype=4, # linetypes: 1=solid, 2=dashed, 
-               show.legend = NA, color = "black")+
-  scale_x_date(breaks=date_breaks("2 years"), 
-               labels=date_format("%Y"))+ #,
-  # limits=as.Date(c(vDateStart, vDateStop))) +
-  scale_y_continuous(breaks = waiver())+
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust=0.5,hjust = 0.5, size = 8))  # rotate x axis text
-plotLevantRestrictive
-
+plot.LevantRestrictive <- f.plot(data.events = vLevantRestrictive, label.location = "Bilād al-Shām", label.subtitle = "Restrictions")
+ggsave(filename = "plot_levant-restrictive.png", 
+       plot = plot.LevantRestrictive,
+       units = units.Plot , height = height.Plot, width = width.Plot, dpi = dpi.Plot)
+plot.LevantRestrictive
 ### histogramm: permissions in the Levant
-plotLevantPermissive <- ggplot()+
-  labs(title="Censorship in Bilad al-Sham", 
-       subtitle="Permissions", 
-       x="Date", 
-       y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(data=vLevantPermissive, aes(x=year, fill=action),position = "stack", width = 200)+
-  #geom_bar(data=vCensorshipPermits, aes(x=year, fill=action),position = "stack", width = 200)+
-  # layer: legal framework
-  geom_jitter(data=vLawsPeriod,(aes(x=year,y=10)),size=3)+
-  scale_x_date(breaks=date_breaks("2 years"), 
-               labels=date_format("%Y"))+ #,
-  # limits=as.Date(c(vDateStart, vDateStop))) +
-  scale_y_continuous(breaks = waiver())+
-  theme_bw()
-plotLevantPermissive
-
+plot.LevantPermissive <- f.plot(data.events = vLevantPermissive, label.location = "Bilād al-Shām", label.subtitle = "Permissions")
+ggsave(filename = "plot_levant-permissive.png", 
+       plot = plot.LevantPermissive,
+       units = units.Plot , height = height.Plot, width = width.Plot, dpi = dpi.Plot)
+plot.LevantPermissive
 ### histogram: suspensions in the Levant
-plotLevantSuspensions <- ggplot()+
-  labs(title="Censorship in Bilad al-Sham", 
-       subtitle="Suspensions", 
-       x="Date", 
-       y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(data=vLevantSuspensions, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipSuspensions, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipWarnings, aes(x=year,fill=action),position = "stack",width = 200)+
-  # layer: legal framework
-  geom_jitter(data=vLawsPeriod,(aes(x=year,y=5)),size=3)+
-  # layer: line for mean; problem: this does not take into account years without suspensions
-  #geom_hline(yintercept = mean(count(vLevantSuspensions,'year')[,c('freq')]))+
-  scale_x_date(breaks=date_breaks("2 years"), 
-               labels=date_format("%Y"))+ #,
-  # limits=as.Date(c(vDateStart, vDateStop))) +
-  scale_y_continuous(breaks = waiver())+
-  theme_bw()
-plotLevantSuspensions
+plot.LevantSuspensions <- f.plot(data.events = vLevantSuspensions, label.location = "Bilād al-Shām", label.subtitle = "Suspensions")
+ggsave(filename = "plot_levant-suspensions.png", 
+       plot = plot.LevantSuspensions,
+       units = units.Plot , height = height.Plot, width = width.Plot, dpi = dpi.Plot)
+plot.LevantSuspensions
+plot.LevantSuspensionsImplemented <- f.plot(data.events = vLevantSuspensionsImplemented, label.location = "Bilād al-Shām", label.subtitle = "Implemented suspensions")
+plot.LevantSuspensionsImplemented
 
-### histogram: suspensions in the Levant
-plotLevantSuspensionsImplemented <- ggplot()+
-  labs(title="Censorship in Bilad al-Sham", 
-       subtitle="Suspensions", 
-       x="Date", 
-       y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(data=vLevantSuspensionsImplemented, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipSuspensions, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipWarnings, aes(x=year,fill=action),position = "stack",width = 200)+
-  # layer: legal framework
-  geom_jitter(data=vLawsPeriod,(aes(x=year,y=5)),size=3)+
-  scale_x_date(breaks=date_breaks("2 years"), 
-               labels=date_format("%Y"))+ #,
-  # limits=as.Date(c(vDateStart, vDateStop))) +
-  scale_y_continuous(breaks = waiver())+
-  theme_bw()
-plotLevantSuspensionsImplemented
 
-### histogram: restrictions in Beirut
-plotBeirutRestrictive <- ggplot()+
-  labs(title="Censorship in Beirut", 
-       subtitle="Restrictions", 
-       x="Date", 
-       y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(data=vBeirutRestrictive, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipSuspensions, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipWarnings, aes(x=year,fill=action),position = "stack",width = 200)+
-  # layer: legal framework
-  geom_jitter(data=vLawsPeriod,(aes(x=date,y=10)),size=3)+
-  scale_x_date(breaks=date_breaks("2 years"), 
-               labels=date_format("%Y"))+ #,
-  # limits=as.Date(c(vDateStart, vDateStop))) +
-  scale_y_continuous(breaks = waiver())+
-  theme_bw()
-plotBeirutRestrictive
 
-### histogramm: permissions Beirut 
-plotBeirutPermissive <- ggplot()+
-  labs(title="Censorship in Beirut", 
-       subtitle="Permissions", 
-       x="Date", 
-       y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(data=vBeirutPermissive, aes(x=year, fill=action),position = "stack", width = 200)+
-  #geom_bar(data=vCensorshipPermits, aes(x=year, fill=action),position = "stack", width = 200)+
-  # layer: legal framework
-  geom_jitter(data=vLawsPeriod,(aes(x=year,y=10)),size=3)+
-  scale_x_date(breaks=date_breaks("2 years"), 
-               labels=date_format("%Y"))+ #,
-  # limits=as.Date(c(vDateStart, vDateStop))) +
-  scale_y_continuous(breaks = waiver())+
-  theme_bw()
-plotBeirutPermissive
-
-### histogram: restrictions in Damascus
-plotDamascusRestrictive <- ggplot()+
-  labs(title="Censorship in Damascus", 
-       subtitle="Restrictions", 
-       x="Date", 
-       y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(data=vDamascusRestrictive, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipSuspensions, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipWarnings, aes(x=year,fill=action),position = "stack",width = 200)+
-  # layer: legal framework
-  geom_jitter(data=vLawsPeriod,(aes(x=date,y=10)),size=3)+
-  scale_x_date(breaks=date_breaks("2 years"), 
-               labels=date_format("%Y"))+ #,
-  # limits=as.Date(c(vDateStart, vDateStop))) +
-  scale_y_continuous(breaks = waiver())+
-  theme_bw()
-plotDamascusRestrictive
-
-### histogramm: permissions Damascus 
-plotDamascusPermissive <- ggplot()+
-  labs(title="Censorship in Damascus", 
-       subtitle="Permissions", 
-       x="Date", 
-       y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(data=vDamascusPermissive, aes(x=year, fill=action),position = "stack", width = 200)+
-  #geom_bar(data=vCensorshipPermits, aes(x=year, fill=action),position = "stack", width = 200)+
-  # layer: legal framework
-  geom_jitter(data=vLawsPeriod,(aes(x=year,y=10)),size=3)+
-  scale_x_date(breaks=date_breaks("2 years"), 
-               labels=date_format("%Y"))+ #,
-  # limits=as.Date(c(vDateStart, vDateStop))) +
-  scale_y_continuous(breaks = waiver())+
-  theme_bw()
-plotDamascusPermissive
-
-### histogram: restrictions in Egypt
-plotEgyptRestrictive <- ggplot()+
-  labs(title="Censorship in Egypt", 
-       subtitle="Restrictions", 
-       x="Date", 
-       y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(data=vEgyptRestrictive, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipSuspensions, aes(x=year,fill=action),position = "stack",width = 200)+
-  #geom_bar(data=vCensorshipWarnings, aes(x=year,fill=action),position = "stack",width = 200)+
-  # layer: legal framework
-  geom_jitter(data=vLawsPeriod,(aes(x=date,y=10)),size=3)+
-  scale_x_date(breaks=date_breaks("2 years"), 
-               labels=date_format("%Y"))+ #,
-  # limits=as.Date(c(vDateStart, vDateStop))) +
-  scale_y_continuous(breaks = waiver())+
-  theme_bw()
-plotEgyptRestrictive
-
-### histogramm: permissions in Egypt
-plotEgyptPermissive <- ggplot()+
-  labs(title="Censorship in Egypt", 
-       subtitle="Permissions", 
-       x="Date", 
-       y="Frequency")+ # provides title, subtitle, x, y, caption
-  geom_bar(data=vEgyptPermissive, aes(x=year, fill=action),position = "stack", width = 200)+
-  #geom_bar(data=vCensorshipPermits, aes(x=year, fill=action),position = "stack", width = 200)+
-  # layer: legal framework
-  geom_jitter(data=vLawsPeriod,(aes(x=year,y=10)),size=3)+
-  scale_x_date(breaks=date_breaks("2 years"), 
-               labels=date_format("%Y"))+ #,
-  # limits=as.Date(c(vDateStart, vDateStop))) +
-  scale_y_continuous(breaks = waiver())+
-  theme_bw()
-plotEgyptPermissive
 
 ### use individual layers
 plotActionFrequency <- ggplot()+
@@ -378,4 +247,3 @@ plotCensorshipTime1 <- ggplot(subset(vCensorshipPeriod,action=="P"), aes(x = dat
   scale_x_date(breaks=date_breaks("2 years"), labels=date_format("%Y")) +
   theme_bw() # make the themeblack-and-white rather than grey (do this before font changes, or it overridesthem)
 plotCensorshipTime1
-
