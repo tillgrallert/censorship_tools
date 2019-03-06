@@ -127,8 +127,8 @@ f.plot <- function(data.events, label.location, label.subtitle) {
              position = "stack",width = 200) +
     # add a layer for laws
     geom_segment(data = vLawsPeriod, 
-                 aes(x = date, y =5.5, 
-                     xend = date, yend = 8.5),
+                 aes(x = date, y = 0, 
+                     xend = date, yend = 3.5),
                  na.rm = T, linetype=4, # linetypes: 1=solid, 2=dashed, 
                  show.legend = NA, color = "black")+
     scale_x_date(breaks=date_breaks("2 years"), labels=date_format("%Y")) +
