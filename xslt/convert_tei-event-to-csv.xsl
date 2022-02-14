@@ -16,6 +16,16 @@
     <xsl:template match="/">
         <!-- head -->
         <xsl:value-of select="$v_beginning-of-line"/>
+        <xsl:text>type</xsl:text><xsl:value-of select="$v_seperator"/>
+        <xsl:text>subtype</xsl:text><xsl:value-of select="$v_seperator"/>
+        <xsl:text>cert</xsl:text><xsl:value-of select="$v_seperator"/>
+        <xsl:text>date.documented</xsl:text><xsl:value-of select="$v_seperator"/>
+        <xsl:text>onset</xsl:text><xsl:value-of select="$v_seperator"/>
+        <xsl:text>terminus</xsl:text><xsl:value-of select="$v_seperator"/>
+        <xsl:text>publication.id</xsl:text><xsl:value-of select="$v_seperator"/>
+        <xsl:text>publication.title</xsl:text><xsl:value-of select="$v_seperator"/>
+        <xsl:text>publication.loc.id</xsl:text><xsl:value-of select="$v_seperator"/>
+        <xsl:text>publication.loc</xsl:text>
         <xsl:value-of select="$v_end-of-line"/>
         <xsl:apply-templates select="descendant::tei:standOff/descendant::tei:event" mode="m_event-to-csv"/>
     </xsl:template>
@@ -41,7 +51,10 @@
         <xsl:apply-templates select="tei:desc/tei:date[@type='terminus'][1]" mode="m_event-to-csv"/><xsl:value-of select="$v_seperator"/>
         <!-- identify periodical -->
         <xsl:value-of select="oape:query-bibliography($v_title, $v_bibliography, '', $p_local-authority, 'id', '')"/><xsl:value-of select="$v_seperator"/>
-        <xsl:value-of select="oape:query-bibliography($v_title, $v_bibliography, '', $p_local-authority, 'name', 'ar-Latn-x-ijmes')"/>
+        <xsl:value-of select="oape:query-bibliography($v_title, $v_bibliography, '', $p_local-authority, 'name', 'ar-Latn-x-ijmes')"/><xsl:value-of select="$v_seperator"/>
+        <!-- publication  -->
+        <xsl:value-of select="oape:query-bibliography($v_title, $v_bibliography, $v_gazetteer, $p_local-authority, 'id-location', '')"/><xsl:value-of select="$v_seperator"/>
+        <xsl:value-of select="oape:query-bibliography($v_title, $v_bibliography, $v_gazetteer, $p_local-authority, 'pubPlace', 'en')"/>
         <xsl:value-of select="$v_end-of-line"/>
     </xsl:template>
     
