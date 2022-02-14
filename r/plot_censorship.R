@@ -15,20 +15,21 @@ source(here("../../../BachBibliothek/GitHub/Sihafa/sihafa_tools/r/parameters.R")
 funcPeriod <- function(f,x,y){f[f$date >= x & f$date <= y,]}
 
 # use a working directory
-setwd(here("../censorship_data"))
+setwd(here("../censorship_data/csv/"))
 
 # 1. read price data from csv, note that the first row is a date
-data.censorship.old <- read.csv("csv/censorship-levant_old.csv", header=TRUE, sep = ",", quote = "")
-data.laws <- read.csv("csv/laws-press-ottoman-empire.csv", header=TRUE, sep = ",", quote = "")
+#data.censorship.old <- read.csv("censorship-levant_old.csv", header=TRUE, sep = ",", quote = "")
+data.laws <- read.csv("laws-press-ottoman-empire.csv", header=TRUE, sep = ",", quote = "")
+data.censorship <- read.csv("censorship-levant.csv", header=TRUE, sep = ",", quote = "\"")
 
 # convert date to Date class
-data.censorship.old$date <- as.Date(data.censorship.old$date)
+#data.censorship.old$date <- as.Date(data.censorship.old$date)
 data.laws$date <- as.Date(data.laws$date)
 
 # aggregate periods
 ## use cut() to generate summary stats for time periods
 ## create variables of the year, quarter week and month of each observation:
-data.censorship <- read.csv("csv/censorship-levant.csv", header=TRUE, sep = ",", quote = "\"")
+
 data.censorship <- data.censorship %>%
   dplyr::mutate(date = as.Date(date.documented),
                 year = as.Date(cut(date, breaks = "year")),
@@ -43,23 +44,61 @@ data.censorship.s <- data.censorship %>%
   dplyr::filter(action == "S")
 data.censorship.w <- data.censorship %>%
   dplyr::filter(action == "W")
+# available titles, i.e. those, which I could check for gaps
+data.censorship.s.imp <- data.censorship.s %>%
+    dplyr::filter(cert == "high")
+unique(data.censorship.s.imp$publication.id)
+data.censorship.s.titles.available <- data.censorship.s %>%
+    subset(publication.id %in% unique(data.censorship.s.imp$publication.id))
+# aggregate by title
+data.censorship.s.titles.available.wide <- data.censorship.s.titles.available %>%
+    dplyr::group_by(publication.id, publication.title, publication.loc.id, publication.loc, cert) %>%
+    dplyr::summarise(events = n()) %>%
+    dplyr::ungroup()# %>%
+    tidyr::pivot_wider(names_from = cert, values_from = events) %>%
+    dplyr::arrange(desc("S"))
+
+data.censorship.aggr.periodical <- data.censorship %>%
+    dplyr::group_by(publication.id, publication.title, publication.loc.id, publication.loc, action) %>%
+    dplyr::summarise(events = n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(desc(events, publication.title))
+## make into wide table
+data.censorship.aggr.periodical.wide <- data.censorship.aggr.periodical %>%
+    dplyr::filter(action %in% c("S", "W", "BI", "PR")) %>%
+    tidyr::pivot_wider(names_from = action, values_from = events) %>%
+    dplyr::arrange(desc("S", "W"))
+
+write.table(data.censorship.aggr.periodical.wide, "censorship_by-periodical.csv" , row.names = F, quote = T , sep = ",")
+
 # aggregate data by year
-data.censorship.aggr.y <- data.censorship %>%
+data.censorship.aggr.year <- data.censorship %>%
   dplyr::group_by(action, cert, year) %>%
   dplyr::summarise(events = n()) %>%
   dplyr::ungroup() %>%
-  tidyr::drop_na()
+    tidyr::drop_na(year) %>%
+    dplyr::arrange(year)
+## make into wide table
+data.censorship.aggr.year.wide <- data.censorship.aggr.year %>%
+    dplyr::group_by(action, year) %>%
+    dplyr::summarise(events = sum(events)) %>%
+    dplyr::filter(action %in% c("S", "W", "BI", "PR")) %>%
+    tidyr::pivot_wider(names_from = action, values_from = events) %>%
+    dplyr::arrange(year)
 
-w <- data.censorship.aggr.y %>%
+write.table(data.censorship.aggr.year.wide, "censorship_by-year.csv" , row.names = F, quote = T , sep = ",")
+
+w <- data.censorship.aggr.year %>%
     dplyr::filter(action == "W")
-s <- data.censorship.aggr.y %>%
+s <- data.censorship.aggr.year %>%
     dplyr::filter(action == "S")
-s.imp <- data.censorship.aggr.y %>%
+s.imp <- data.censorship.aggr.year %>%
     dplyr::filter(action == "S",
                   cert == "high")
 sum(w$events)
 sum(s$events)
 sum(s.imp$events)
+f.percent(sum(s$events), sum(s.imp$events))
 
 # plot
 ## plot frequencies of actions
@@ -77,21 +116,24 @@ f.plot.censorship <- function(data.events, label.location, label.subtitle) {
              subtitle = label.subtitle,
              caption = v.label.license) + # provides title, subtitle, x, y, caption
         geom_bar(data = data.events,
-                 aes(x = year, y = events, fill = action),
+                 aes(x = year, y = events
+                     #fill = action)
+                 ),
                  stat="identity",
                  #position = "stack",
+                 fill = "black",
                  width = 200) +
         # add a layer for laws
         geom_segment(data = funcPeriod(data.laws, as.Date('1875-01-01'), as.Date('1914-12-31')),
                      aes(x = date, y = 0,
                          xend = date, yend = max(data.events$events)),
                      na.rm = T, linetype=4, # linetypes: 1=solid, 2=dashed,
-                     show.legend = NA, color = "grey")
+                     show.legend = NA, color = v.colour.grey.dark)
 }
 # plots by type
-plot.censorship.s.implemented <-f.plot.censorship(dplyr::filter(data.censorship, action == c("S"), cert == "high"), 'Beirut and Damascus', 'Suspensions that correspond to gaps in publication')
+plot.censorship.s.implemented <-f.plot.censorship(dplyr::filter(data.censorship, action == c("S"), !publication.loc %in% c("Alexandria", "Istanbul"), cert == "high"), 'Beirut and Damascus', 'Suspensions that correspond to gaps in publication')
 plot.censorship.s.implemented
-plot.censorship.s <- f.plot.censorship(dplyr::filter(data.censorship, action == c("S")), 'Beirut and Damascus', 'Suspensions issued by the authorities')
+plot.censorship.s <- f.plot.censorship(dplyr::filter(data.censorship, action == c("S"), !publication.loc %in% c("Alexandria", "Istanbul")), 'Beirut and Damascus', 'Suspensions issued by the authorities')
 plot.censorship.w <- f.plot.censorship(dplyr::filter(data.censorship, action == c("W")), 'Beirut and Damascus', 'Warnings issued by the authorities')
 # save plots
 setwd(here("../censorship_data", "plots"))
@@ -107,9 +149,33 @@ ggsave(plot = plot.censorship.w,
        filename = "plot_censorship-w.png",
        units = units.Plot , height = height.Plot, width = width.Plot, dpi = dpi.Plot)
 
-f.plot.censorship(dplyr::filter(data.censorship, action == c("S", "W", "BI")), 'Beirut and Damascus', '') +
-    facet_wrap(~ action, ncol = 3)
+#f.plot.censorship(dplyr::filter(data.censorship, action == c("S", "W", "BI")), 'Beirut and Damascus', '') +
+ #   facet_wrap(~ action, ncol = 3)
 
+f.plot.censorship.dots <- function(data.events,  label.location, label.subtitle) {
+    # data processing
+    # plot
+    plot.timeline.base +
+    labs(x = "",
+         y = "events",
+         title = paste("The press regime in ", label.location, sep = ""),
+         subtitle = label.subtitle,
+         caption = v.label.license) +
+    geom_point(data = data.events, aes(x = date, y = action),
+               shape = 21, color = "black", fill = v.colour.grey,
+               size = 10, stroke = 0.5, alpha = 0.3) +
+        geom_segment(data = funcPeriod(data.laws, as.Date('1875-01-01'), as.Date('1914-12-31')),
+                     aes(x = date, xend = date,
+                         y = "S", yend = "W"),
+                     na.rm = T, linetype = 4, # linetypes: 1=solid, 2=dashed,
+                     show.legend = T, color = v.colour.grey.dark) +
+        theme(legend.position = "bottom")
+}
+
+plot.censorship.dots <- f.plot.censorship.dots(dplyr::filter(data.censorship, action %in% c("W", "S"), !publication.loc %in% c("Alexandria", "Istanbul")), 'Beirut and Damascus', 'Warnings and suspensions issued by the authorities')
+ggsave(plot = plot.censorship.dots,
+       filename = "plot_censorship_dots.png",
+       units = units.Plot , height = 80, width = 400, dpi = dpi.Plot)
 # old stuff
 
 data.censorship.old <- data.censorship.old.%>%
