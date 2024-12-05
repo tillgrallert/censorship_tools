@@ -62,12 +62,12 @@ data.censorship.aggr.periodical <- data.censorship %>%
     dplyr::group_by(publication.id, publication.title, publication.loc.id, publication.loc, action) %>%
     dplyr::summarise(events = n()) %>%
     dplyr::ungroup() %>%
-    dplyr::arrange(desc(events, publication.title))
+    dplyr::arrange(desc(events), desc(publication.title))
 ## make into wide table
 data.censorship.aggr.periodical.wide <- data.censorship.aggr.periodical %>%
     dplyr::filter(action %in% c("S", "W", "BI", "PR")) %>%
     tidyr::pivot_wider(names_from = action, values_from = events) %>%
-    dplyr::arrange(desc("S", "W"))
+    dplyr::arrange(desc("S"), desc("W"))
 
 write.table(data.censorship.aggr.periodical.wide, "censorship_by-periodical.csv" , row.names = F, quote = T , sep = ",")
 
