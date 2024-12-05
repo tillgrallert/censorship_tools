@@ -51,7 +51,7 @@
         <xsl:apply-templates select="tei:desc/tei:date[@type='terminus'][1]" mode="m_event-to-csv"/><xsl:value-of select="$v_seperator"/>
         <!-- identify periodical -->
         <xsl:value-of select="oape:query-bibliography($v_title, $v_bibliography, '', $p_local-authority, 'id', '')"/><xsl:value-of select="$v_seperator"/>
-        <xsl:value-of select="oape:query-bibliography($v_title, $v_bibliography, '', $p_local-authority, 'name', 'ar-Latn-x-ijmes')"/><xsl:value-of select="$v_seperator"/>
+        <xsl:value-of select="oape:query-bibliography($v_title, $v_bibliography, '', $p_local-authority, 'name', 'Latn-x-ijmes')"/><xsl:value-of select="$v_seperator"/>
         <!-- publication  -->
         <xsl:value-of select="oape:query-bibliography($v_title, $v_bibliography, $v_gazetteer, $p_local-authority, 'id-location', '')"/><xsl:value-of select="$v_seperator"/>
         <xsl:value-of select="oape:query-bibliography($v_title, $v_bibliography, $v_gazetteer, $p_local-authority, 'pubPlace', 'en')"/>
