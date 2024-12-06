@@ -24,24 +24,15 @@ data.censorship <- data.censorship %>%
 
 write.table(data.censorship, "censorship-levant_processed.csv" , row.names = F, quote = T , sep = ",")
 # filter for specific types
-data.censorship.s <- data.censorship %>%
+data.censorship %>%
   dplyr::filter(action == "S")
-data.censorship.w <- data.censorship %>%
-  dplyr::filter(action == "W")
-# available titles, i.e. those, which I could check for gaps
-data.censorship.s.imp <- data.censorship.s %>%
-    dplyr::filter(cert == "high")
-unique(data.censorship.s.imp$publication.id)
-data.censorship.s.titles.available <- data.censorship.s %>%
-    subset(publication.id %in% unique(data.censorship.s.imp$publication.id))
-# aggregate by title
-data.censorship.s.titles.available.wide <- data.censorship.s.titles.available %>%
-    dplyr::group_by(publication.id, publication.title, publication.loc.id, publication.loc, cert) %>%
-    dplyr::summarise(events = n()) %>%
-    dplyr::ungroup() #%>%
-    #tidyr::pivot_wider(names_from = cert, values_from = events) %>%
-    #dplyr::arrange(desc("S"))
+# implementation, certitude of an event
+data.censorship.s.imp <- data.censorship %>%
+    dplyr::filter(action == "S", cert == "high")
+# list of titles
+unique(data.censorship.s.imp$publication.title)
 
+# aggregate by title
 data.censorship.aggr.periodical <- data.censorship %>%
     dplyr::group_by(publication.id, publication.title, publication.loc.id, publication.loc, action) %>%
     dplyr::summarise(events = n()) %>%
@@ -50,7 +41,7 @@ data.censorship.aggr.periodical <- data.censorship %>%
 ## make into wide table
 data.censorship.aggr.periodical.wide <- data.censorship.aggr.periodical %>%
     dplyr::filter(action %in% c("S", "W", "BI", "PR")) %>%
-    tidyr::pivot_wider(names_from = action, values_from = events) %>%
+    tidyr::pivot_wider(names_from = action, values_from = events, values_fill = 0) %>%
     dplyr::arrange(desc("S"), desc("W"))
 
 write.table(data.censorship.aggr.periodical.wide, "censorship_by-periodical.csv" , row.names = F, quote = T , sep = ",")
@@ -67,7 +58,7 @@ data.censorship.aggr.year.wide <- data.censorship.aggr.year %>%
     dplyr::group_by(action, year) %>%
     dplyr::summarise(events = sum(events)) %>%
     dplyr::filter(action %in% c("S", "W", "BI", "PR")) %>%
-    tidyr::pivot_wider(names_from = action, values_from = events) %>%
+    tidyr::pivot_wider(names_from = action, values_from = events, values_fill = 0) %>%
     dplyr::arrange(year)
 
 write.table(data.censorship.aggr.year.wide, "censorship_by-year.csv" , row.names = F, quote = T , sep = ",")
