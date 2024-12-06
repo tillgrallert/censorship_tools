@@ -1,3 +1,6 @@
+# set a general theme for all ggplots
+theme_set(theme_bw())
+
 # labels
 v.label.license = paste("Till Grallert ", lubridate::year(Sys.Date()), ", CC BY-SA 4.0", sep = "")
 
