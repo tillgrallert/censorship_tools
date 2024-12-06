@@ -65,14 +65,25 @@ f.plot.censorship <- function(data.events, label.location, label.subtitle) {
                      show.legend = NA, color = v.colour.grey.dark)
 }
 # plots by type
+## implemented suspensions
 plot.censorship.s.implemented <-f.plot.censorship(
     dplyr::filter(data.censorship,
-                  action == c("S"),
-                  !publication.loc %in% c("Alexandria", "Istanbul"),
-                  cert == "high"), 'Beirut and Damascus', 'Suspensions that correspond to gaps in publication')
+                  action == c("S"), # only suspensions
+                  cert == "high",   # high certitude, meaning implemented
+                  !publication.loc %in% c("Cairo", "Istanbul")), # remove places of publication
+    'Bilād al-Shām', 'Suspensions that correspond to gaps in publication')
 plot.censorship.s.implemented
-plot.censorship.s <- f.plot.censorship(dplyr::filter(data.censorship, action == c("S"), !publication.loc %in% c("Alexandria", "Istanbul")), 'Beirut and Damascus', 'Suspensions issued by the authorities')
-plot.censorship.w <- f.plot.censorship(dplyr::filter(data.censorship, action == c("W")), 'Beirut and Damascus', 'Warnings issued by the authorities')
+## all suspensions
+plot.censorship.s <- f.plot.censorship(
+    dplyr::filter(data.censorship,
+                  action == c("S"),
+                  !publication.loc %in% c("Cairo", "Istanbul")),
+    'Bilād al-Shām', 'Suspensions issued by the authorities')
+## warnings: only issued to newspapers form Beirut
+plot.censorship.w <- f.plot.censorship(
+    dplyr::filter(data.censorship,
+                  action == c("W")),
+    'Bilād al-Shām', 'Warnings issued by the authorities')
 # save plots
 setwd(here("../censorship_data", "plots"))
 height.Plot = 130
@@ -110,7 +121,11 @@ f.plot.censorship.dots <- function(data.events,  label.location, label.subtitle)
         theme(legend.position = "bottom")
 }
 
-plot.censorship.dots <- f.plot.censorship.dots(dplyr::filter(data.censorship, action %in% c("W", "S"), !publication.loc %in% c("Alexandria", "Istanbul")), 'Beirut and Damascus', 'Warnings and suspensions issued by the authorities')
+plot.censorship.dots <- f.plot.censorship.dots(
+    dplyr::filter(data.censorship,
+                  action %in% c("W", "S"),
+                  !publication.loc %in% c("Alexandria","Cairo","Istanbul")),
+    'Beirut and Damascus', 'Warnings and suspensions issued by the authorities')
 ggsave(plot = plot.censorship.dots,
        filename = "plot_censorship_dots.png",
        units = units.Plot , height = 80, width = 400, dpi = dpi.Plot)
