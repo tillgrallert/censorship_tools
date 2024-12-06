@@ -129,3 +129,12 @@ plot.censorship.dots <- f.plot.censorship.dots(
 ggsave(plot = plot.censorship.dots,
        filename = "plot_censorship_dots.png",
        units = units.Plot , height = 80, width = 400, dpi = dpi.Plot)
+ggsave(plot = plot.censorship.dots,
+       filename = "plot_censorship_dots.svg",
+       units = units.Plot , height = 80, width = 400, dpi = dpi.Plot)
+
+f.plot.censorship.dots(
+    dplyr::filter(data.censorship,
+                  #action %in% c("W", "S"),
+                  !publication.loc %in% c("Alexandria","Cairo","Istanbul")),
+    'Beirut and Damascus', 'Warnings and suspensions issued by the authorities')
