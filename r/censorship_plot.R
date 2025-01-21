@@ -44,19 +44,16 @@ f.plot.censorship <- function(data.events, label.location, label.subtitle) {
         dplyr::ungroup() %>%
         tidyr::drop_na()
     plot.timeline.base +
-        labs(x = "",
-             y = "events",
+        labs(x = "", y = "events",
              title = paste("The press regime in ", label.location, sep = ""),
-             subtitle = label.subtitle,
-             caption = v.label.license) + # provides title, subtitle, x, y, caption
+             subtitle = label.subtitle, caption = v.label.license) + # provides title, subtitle, x, y, caption
         geom_bar(data = data.events,
                  aes(x = year, y = events
                      #fill = action)
                  ),
                  stat="identity",
                  #position = "stack",
-                 fill = "black",
-                 width = 200) +
+                 fill = "black", width = 200) +
         # add a layer for laws
         geom_segment(data = funcPeriod(data.laws, as.Date('1875-01-01'), as.Date('1914-12-31')),
                      aes(x = date, y = 0,
@@ -105,12 +102,10 @@ f.plot.censorship.dots <- function(data.events,  label.location, label.subtitle)
     # data processing
     # plot
     plot.timeline.base +
-    labs(x = "",
-         y = "events",
-         title = paste("The press regime in ", label.location, sep = ""),
-         subtitle = label.subtitle,
-         caption = v.label.license) +
-    geom_point(data = data.events, aes(x = date, y = action),
+        labs(x = "", y = "events",
+             title = paste("The press regime in ", label.location, sep = ""),
+             subtitle = label.subtitle,caption = v.label.license) +
+        geom_point(data = data.events, aes(x = date, y = action),
                shape = 21, color = "black", fill = v.colour.grey,
                size = 10, stroke = 0.5, alpha = 0.3) +
         geom_segment(data = funcPeriod(data.laws, as.Date('1875-01-01'), as.Date('1914-12-31')),
@@ -126,6 +121,7 @@ plot.censorship.dots <- f.plot.censorship.dots(
                   action %in% c("W", "S"),
                   !publication.loc %in% c("Alexandria","Cairo","Istanbul", "Salonica")),
     'Beirut and Damascus', 'Warnings and suspensions issued by the authorities')
+setwd(here("../censorship_data", "plots"))
 ggsave(plot = plot.censorship.dots,
        filename = "plot_censorship_dots.png",
        units = units.Plot , height = 80, width = 400, dpi = dpi.Plot)
